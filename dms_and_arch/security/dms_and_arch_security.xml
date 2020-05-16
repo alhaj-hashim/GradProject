@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_dms" model="ir.module.category">
+        <field name="name">DMS</field>
+        <field name="sequence" eval="1"/>
+    </record>
+
+    <record id="group_dms_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_dms"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_dms_hremp" model="res.groups">
+        <field name="name">HR Employee</field>
+        <field name="category_id" ref="module_category_dms"/>
+        <field name="implied_ids" eval="[(4, ref('dms_and_arch.group_dms_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <record id="group_dms_accemp" model="res.groups">
+        <field name="name">Acc. Employee</field>
+        <field name="category_id" ref="module_category_dms"/>
+        <field name="implied_ids" eval="[(4, ref('dms_and_arch.group_dms_hremp'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <record id="group_dms_arch_user" model="res.groups">
+        <field name="name">Archive</field>
+        <field name="category_id" ref="module_category_dms"/>
+        <field name="implied_ids" eval="[(4, ref('dms_and_arch.group_dms_accemp'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <record id="group_dms_depmanagr" model="res.groups">
+        <field name="name">Dep. Manager</field>
+        <field name="category_id" ref="module_category_dms"/>
+        <field name="implied_ids" eval="[(4, ref('dms_and_arch.group_dms_arch_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <record id="group_dms_hrmanagr" model="res.groups">
+        <field name="name">HR Manager</field>
+        <field name="category_id" ref="module_category_dms"/>
+        <field name="implied_ids" eval="[(4, ref('dms_and_arch.group_dms_depmanagr'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!--   ##################### Record Rule ##################### -->
+    <record id="dms_leave_rule_employee" model="ir.rule">
+        <field name="name">DMS: employee</field>
+        <field name="model_id" ref="model_hr_leave"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4,ref('dms_and_arch.group_dms_user'))]"/>
+    </record>
+
+<!--    <record id="hr_leave_rule_employee_update" model="ir.rule">-->
+<!--        <field name="name">Leaves: employee: create/write/unlink not validated own</field>-->
+<!--        <field name="model_id" ref="model_hr_leave"/>-->
+<!--        <field name="domain_force">[('employee_id.user_id','=',user.id), ('state', 'in', ['draft', 'confirm', 'cancel', 'refuse'])]</field>-->
+<!--        <field name="perm_read" eval="False"/>-->
+<!--        <field name="groups" eval="[(4,ref('base.group_user'))]"/>-->
+<!--    </record>-->
+
+<!--    <record id="hr_leave_rule_officer_read" model="ir.rule">-->
+<!--        <field name="name">Leaves: officer: read all</field>-->
+<!--        <field name="model_id" ref="model_hr_leave"/>-->
+<!--        <field name="domain_force">[(1, '=', 1)]</field>-->
+<!--        <field name="perm_create" eval="False"/>-->
+<!--        <field name="perm_write" eval="False"/>-->
+<!--        <field name="perm_unlink" eval="False"/>-->
+<!--        <field name="groups" eval="[(4, ref('hr_holidays.group_hr_holidays_user'))]"/>-->
+<!--    </record>-->
+
+    <record id="dms_leave_rule_drmngr_update" model="ir.rule">
+        <field name="name">DMS: Dep Manager: create/write/unlink own + managed employee + without department + same or managed department</field>
+        <field name="model_id" ref="model_hr_leave"/>
+        <field name="domain_force">['|',
+'|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id),
+'|', '|', ('department_id', '=', False), ('department_id.member_ids.user_id', 'in', [user.id]), ('department_id.manager_id.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="groups" eval="[(4, ref('dms_and_arch.group_dms_depmanagr'))]"/>
+    </record>
+
+    <record id="dms_leave_rule_hremp_update" model="ir.rule">
+        <field name="name">DMS: HR Employee</field>
+        <field name="model_id" ref="model_hr_leave"/>
+        <field name="domain_force">[('state', '=', 'confirm')]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="groups" eval="[(4, ref('dms_and_arch.group_dms_hremp'))]"/>
+    </record>
+
+    <record id="dms_leave_rule_hr_manager" model="ir.rule">
+        <field name="name">DMS: manager: no limit</field>
+        <field name="model_id" ref="model_hr_leave"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('dms_and_arch.group_dms_hrmanagr'))]"/>
+    </record>
+
+    <record id="resource_leaves_hr_mngr" model="ir.rule">
+        <field name="name">Leaves Resources HR Manager</field>
+        <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4,ref('dms_and_arch.group_dms_hrmanagr'))]"/>
+    </record>
+
+
+</odoo>

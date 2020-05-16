@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="dms_hr_department" model="hr.department">
+            <field name="name">Human Resource</field>
+        </record>
+
+        <record id="temp_server" model="muk_dms.storage">
+            <field name="name">Temporary Server</field>
+        </record>
+
+        <record id="dms_muk_arch" model="muk_dms.directory">
+            <field name="name">Temporary</field>
+            <field name="is_root_directory" eval="True" />
+            <field name="is_temp_directory" eval="True" />
+            <field name="root_storage" ref="dms_and_arch.temp_server" />
+        </record>
+
+    </data>
+</odoo>

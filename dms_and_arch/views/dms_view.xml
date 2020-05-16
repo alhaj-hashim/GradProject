@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+<!--    ROOT Menu -->
+    <menuitem id="dms_and_arch_menu_root" name="Documents Management" sequence="0"/>
+
+<!--    SUB Menu -->
+    <menuitem id="dms_hr_menu" name="Human Resource" parent="dms_and_arch_menu_root" sequence="1"/>
+    <menuitem id="dms_hr_leav_manag_menu" name="Leaves Management" parent="dms_and_arch_menu_root" sequence="2"/>
+    <menuitem id="dms_arch_menu" name="Archive" parent="dms_and_arch_menu_root" sequence="3"/>
+
+    <menuitem id="dms_hr_emp_menu"
+              name="Employees"
+              parent="dms_hr_menu"
+              action="hr.open_view_employee_list_my" sequence="1"/>
+
+    <menuitem id="dms_hr_cont_menu"
+              name="Contracts"
+              parent="dms_hr_menu"
+              action="hr_contract.action_hr_contract"
+              groups="dms_and_arch.group_dms_hremp,dms_and_arch.group_dms_accemp" sequence="2"/>
+
+    <menuitem id="dms_hr_manag_menu"
+              name="Manager"
+              parent="dms_hr_menu" sequence="3"/>
+
+
+    <menuitem id="dms_leave_myreq_menu"
+              name="My Leaves Requests"
+              parent="dms_hr_leav_manag_menu"
+              action="hr_holidays.hr_leave_action_my" sequence="2"/>
+
+    <menuitem id="dms_hr_newreq_menu"
+              parent="dms_hr_leav_manag_menu"
+              action="hr_holidays.hr_leave_action_new_request" sequence="1"/>
+
+    <menuitem id="dms_leaves_managr_menu"
+              name="Manager"
+              parent="dms_hr_leav_manag_menu" sequence="3"/>
+
+    <menuitem id="dms_directory_menu"
+              name="Directories"
+              parent="dms_arch_menu"
+              action="muk_dms.action_dms_directory" sequence="1"/>
+
+<!--   ############################################### -->
+<!--   ################# HR employee ################# -->
+<!--   ############################################### -->
+
+    <!-- Inherit Form View to Modify it -->
+    <record id="dms_hr_emp_inh_form" model="ir.ui.view">
+        <field name="name">Employees</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='image']" position="before">
+                <div class="o_row o_row_readonly">
+                    <h1 style="color:#A9A9A9;"><field name="emp_info" /></h1>
+                </div>
+                <div></div>
+            </xpath>
+
+            <xpath expr="//page[@name='public']" position="replace" >
+
+                <page name="public" string="Contact Information">
+                    <group string="Contact Information">
+                        <field name="address_id"
+                            context="{'show_address': 1}"
+                            options='{"always_reload": True, "highlight_first_line": True}'/>
+                        <field name="work_location"/>
+                        <field name="work_email" widget="email"/>
+                        <field name="mobile_phone" widget="phone"/>
+                        <field name="work_phone" widget="phone"/>
+                    </group>
+                </page>
+                <page string="Position Information">
+                    <group>
+<!--                        <group string="Is a">-->
+<!--                            <field name="hrmanager" />-->
+<!--                            <field name="drmanager" />-->
+<!--                        </group>-->
+                        <group string="Position">
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                            <field name="job_title"/>
+                            <field name="parent_id"/>
+<!--                            <field name="drmanager_id" />-->
+                            <field name="coach_id"/>
+                            <field name="resource_calendar_id" required="1"/>
+                            <field name="tz"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Other Information ..." colspan="4"/>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+<!--   ############################################## -->
+<!--   ################# HR holiday ################# -->
+<!--   ############################################## -->
+
+    <record id="hr_leave_inhr_form" model="ir.ui.view">
+        <field name="name">hr.leave.inh.form</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="replace">
+                <header>
+                    <button string="To Direct Manager" name="action_to_dm" states="draft" type="object" groups="dms_and_arch.group_dms_user" class="oe_highlight"/>
+                    <button string="To HR Employee" name="action_to_hremp" states="dirmang" type="object" groups="dms_and_arch.group_dms_depmanagr" class="oe_highlight"/>
+                    <button string="To HR Manager" name="action_to_hrmang" states="confirm" type="object" groups="dms_and_arch.group_dms_hremp" class="oe_highlight"/>
+<!--                    <button string="Approve" name="action_approve" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('can_approve', '=', False), ('state', '!=', 'confirm')]}"/>-->
+                    <button string="Validate" name="action_validate" states="validate1" type="object" groups="dms_and_arch.group_dms_hrmanagr" class="oe_highlight"/>
+                    <button string="Reject" name="%(dms_and_arch.action_rjct_lev_by_manager)d"  type="action" groups="dms_and_arch.group_dms_depmanagr,dms_and_arch.group_dms_hrmanagr" class="btn btn-danger" attrs="{'invisible': ['|', ('can_approve', '=', False), ('state', 'not in', ('dirmang','validate1'))]}"/>
+                    <button string="Arch" name="open_muk_directory"  type="object" class="oe_highlight" states="validate" />
+                    <button string="Reset to Draft" name="reset_to_draft" type="object" groups="dms_and_arch.group_dms_depmanagr"
+                            attrs="{'invisible': ['|',('can_reset', '=', False),('state', '!=', 'dirmang')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,validate"/>
+                </header>
+            </xpath>
+
+            <xpath expr="//group[@name='col_right']" position="after">
+                <group>
+
+                    <div>
+
+                        <div class="oe_left">
+                            <separator string="Direct Manager Reasons"/>
+                            <field name="note_dm" nolabel="1" class="oe_inline"/>
+                        </div>
+
+                        <div class="oe_right">
+                            <separator string="HR Manager Reasons"/>
+                            <field name="note_hm" nolabel="1"/>
+                        </div>
+                    </div>
+
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Inherit Form View to Modify it -->
+    <record id="hr_leave_form_inh_manager" model="ir.ui.view">
+        <field name="name">hr.lev.form.inh.mngr</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+        <field name="mode">primary</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+
+            <xpath expr="//group[@name='col_right']" position="replace">
+                <group>
+                    <field name="holiday_type" string="Mode"
+                        groups="dms_and_arch.group_dms_depmanagr,dms_and_arch.group_dms_hrmanagr"/>
+                    <field name="employee_id" groups="hr_holidays.group_hr_holidays_user" attrs="{
+                        'required': [('holiday_type', '=', 'employee')],
+                        'invisible': [('holiday_type', '!=', 'employee')]
+                        }"/>
+                    <field name="mode_company_id" groups="hr_holidays.group_hr_holidays_user" attrs="{
+                        'required': [('holiday_type', '=', 'company')],
+                        'invisible': [('holiday_type', '!=', 'company')]
+                        }"/>
+                    <field name="category_id" groups="hr_holidays.group_hr_holidays_user" attrs="{
+                        'required': [('holiday_type', '=', 'category')],
+                        'invisible': [('holiday_type', '!=','category')]
+                        }"/>
+                    <field name="department_id" groups="hr_holidays.group_hr_holidays_user" attrs="{
+                        'required': [('holiday_type', '=', 'department')],
+                        'invisible': [('holiday_type', 'not in', ('employee', 'department'))]
+                        }"/>
+                    <field name="payslip_status" groups="dms_and_arch.group_dms_hremp" widget="toggle_button"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Search view to HR leav -->
+    <record id="view_dms_leave_filter" model="ir.ui.view">
+        <field name="name">dms.holidays.filter</field>
+        <field name="model">hr.leave</field>
+        <field name="arch" type="xml">
+            <search string="DMS Search Leave">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="holiday_status_id"/>
+                <field name="name"/>
+                <filter domain="[('state','=', 'dirmang')]" string="In Progress" name="depaprov"/>
+                <filter domain="[('state', '=', 'confirm')]" string="To HR Manager" name="hremp"/>
+                <filter domain="[('state', '=', 'validate1')]" string="To Approve" name="hrmngraprov"/>
+                <filter string="Approved Leaves" domain="[('state', '=', 'validate')]" name="validated"/>
+                <separator/>
+                <filter string="My Department Leaves" name="department" domain="[('department_id.member_ids.user_id', '=', uid)]" help="My Department Leaves"/>
+                <filter string="My Team Leaves" name="my_team_leaves" domain="[('employee_id.parent_id.user_id', '=', uid)]" groups="dms_and_arch.group_dms_depmanagr" help="Leaves of Your Team Member"/>
+                <separator/>
+<!--                <filter string="To Report in Payslip" name="gray" domain="[('payslip_status', '=', False)]" groups="hr_holidays.group_hr_holidays_manager"/>-->
+<!--                <separator/>-->
+                <filter string="My Leaves" name="my_leaves" domain="[('employee_id.user_id', '=', uid)]"/>
+
+            </search>
+        </field>
+    </record>
+
+
+
+
+    <record id="dms_leave_drm_action" model="ir.actions.act_window">
+        <field name="name">In Progress</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.leave</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            'search_default_depaprov': 1,
+            'search_default_my_team_leaves': 1}
+        </field>
+    </record>
+
+    <menuitem id="dms_leave_drm_menu"
+              parent="dms_leaves_managr_menu"
+              action="dms_leave_drm_action"
+              groups="dms_and_arch.group_dms_depmanagr" sequence="1"/>
+
+    <record id="dms_leave_hremp_action" model="ir.actions.act_window">
+        <field name="name">To HR Manager</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.leave</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_hremp': 1}</field>
+    </record>
+
+    <menuitem id="dms_leave_hremp_menu"
+              parent="dms_leaves_managr_menu"
+              action="dms_leave_hremp_action"
+              groups="dms_and_arch.group_dms_hremp" sequence="2"/>
+
+    <record id="dms_leave_hr_mngr_action" model="ir.actions.act_window">
+        <field name="name">To Approve</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.leave</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_hrmngraprov': 1}</field>
+    </record>
+
+    <menuitem id="dms_leave_hr_mngr_menu"
+              parent="dms_leaves_managr_menu"
+              action="dms_leave_hr_mngr_action"
+              groups="dms_and_arch.group_dms_hrmanagr" sequence="3"/>
+
+<!--        <record id="muk_dms_directory_view_form_inherit_org_chart" model="ir.ui.view">-->
+<!--            <field name="name">muk.dms.directory.view.form.inherit.org_chart</field>-->
+<!--            <field name="model">muk_dms.directory</field>-->
+<!--            <field name="inherit_id" ref="muk_dms.view_dms_directory_form"/>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <field name="thumbnail" position="before">-->
+<!--                    <div id="o_directory_container">-->
+<!--                        <div id="o_directory_main">-->
+<!--                            <div id="o_employee_right">-->
+<!--                                <h4 class="o_org_chart_title mb16 mt0">Organization Chart</h4>-->
+<!--                                <field name="child_directories" widget="dms_org_chart"/>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </field>-->
+<!--            </field>-->
+<!--        </record>-->
+
+
+
+</odoo>

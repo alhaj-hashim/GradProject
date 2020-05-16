@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="dms_contract_acc_wiz_form" model="ir.ui.view">
+        <field name="name">Contract Accounting</field>
+        <field name="model">dms.contract.acc.wiz</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="wage" />
+                <footer>
+                    <button name="writeWage" string="Apply" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_contract_acc_wiz" model="ir.actions.act_window">
+        <field name="name">Contract Accounting</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.contract.acc.wiz</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="dms_contract_acc_wiz_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

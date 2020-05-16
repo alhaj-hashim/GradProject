@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+     <record id="hr_contract_inhr_form" model="ir.ui.view">
+        <field name="name">hr.contract.inh.form</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="replace">
+                <header>
+                    <button string="To Accounting" name="action_to_acc" states="draft" type="object" class="oe_highlight"/>
+                    <button string="Add Accounting Info." name="%(dms_and_arch.action_contract_acc_wiz)d"  type="action" class="oe_highlight" states="accounted"/>
+                    <button string="Approve" name="action_to_approve" states="hrmang" type="object" class="oe_highlight"/>
+                    <button string="Opening" name="contract_open" states="approved" type="object" class="oe_highlight"/>
+                    <button string="Arch" name="open_muk_directory"  type="object" class="oe_highlight" states="open" />
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,accounted,hrmang,approved"/>
+                </header>
+            </xpath>
+
+            <xpath expr="//page[@name='information']" position="after">
+                <page string="Arch" name="arch">
+                    <field name="pdf_contract" />
+                </page>
+            </xpath>
+
+            <xpath expr="//field[@name='wage']" position="replace">
+                <field name="wage" nolabel="1" attrs="{'required': [('state', 'in', ('accounted'))]}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="action_dms_hr_contract_inhrt" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">hr.contract</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="domain">[('employee_id', '!=', False)]</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Create a new contract
+          </p>
+        </field>
+    </record>
+
+    <menuitem id="dms_hr_cont_menu"
+              name="Contracts"
+              parent="dms_and_arch.dms_hr_menu"
+              action="action_dms_hr_contract_inhrt" sequence="2"/>
+
+    <record id="action_dms_hr_emp_2_contract_inhrt" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">hr.contract</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{
+            'search_default_employee_id': [active_id],
+            'default_employee_id': active_id
+            }</field>
+    </record>
+
+<!--    oeStat contract replace action-->
+
+    <record id="hr_emp_inhr_oe_stat_btn" model="ir.ui.view">
+        <field name="name">hr.employee.osb</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <data>
+            <xpath expr="//button[@name='%(hr_contract.act_hr_employee_2_hr_contract)d']" position="replace">
+                <button name="%(action_dms_hr_emp_2_contract_inhrt)d"
+                    class="oe_stat_button"
+                    icon="fa-book"
+                    type="action"
+                    groups="hr.group_hr_manager">
+                    <field name="contracts_count" widget="statinfo" string="Contracts"/>
+                </button>
+            </xpath>
+            </data>
+        </field>
+    </record>
+
+    <menuitem id="dms_hr_cont_menu"
+              name="Contracts"
+              parent="dms_and_arch.dms_hr_menu"
+              action="action_dms_hr_contract_inhrt" sequence="2"/>
+
+</odoo>

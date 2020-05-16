@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+       <!-- QWeb Reports -->
+       <!-- NAME & FILE_NAME should be the same -->
+       <report
+           id="action_leave_req_report"
+           model="hr.leave"
+           report_type="qweb-pdf"
+           string="Leave Request"
+           name="dms_and_arch.dms_leav_template_repo"
+           file="dms_and_arch.dms_leav_template_repo"
+           menu="False"
+       />
+        <!--  attachment="'LR-' + object.name + '.pdf'"      -->
+
+       <report
+           id="action_hr_contract_report"
+           model="hr.contract"
+           report_type="qweb-pdf"
+           string="Employee Contract"
+           name="dms_and_arch.dms_hrcontract_template_repo"
+           file="dms_and_arch.dms_hrcontract_template_repo"
+           menu="False"
+       />
+        <!--  attachment="'LR-' + object.name + '.pdf'"      -->
+
+    </data>
+</odoo>

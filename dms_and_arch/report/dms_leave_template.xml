@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <template id="dms_leav_template_repo">
+            <t t-call="web.html_container">
+        <!--        <t t-call="report.internal_layout">-->
+                 <t t-call="web.external_layout">
+                     <t t-foreach="docs" t-as="o">
+
+                        <div class="page">
+
+                                <div style="direction: rtl">
+
+                                    <h5 style="solid;text-align:right;padding:20px 0;">السيد : مدير الموارد البشرية   ............../المحترم</h5>
+                                    <h5 style="solid;text-align:right;padding:20px 0;">عن طريق : مدير الـ  <span t-field="o.department_id.name" />............../المحترم</h5>
+
+                                    <center>
+                                            <span>السلام عليكم ورحمة الله و بركاته</span>
+
+                                            <br /><br /><br />
+
+                                            <h3><u>
+                                                الموضوع : طلب <span t-field="o.holiday_status_id.name" />
+                                            </u></h3>
+                                    </center>
+
+                                    <h5 style="solid;text-align:right;padding:20px 0;">
+                                       بالاشارة للموضوع اعلاه أرغب منحي  <span t-field="o.holiday_status_id.name" /> لمدة (<span t-field="o.number_of_days_display" /> ) ايام <br />
+                                       اعتبارا من تاريخ (<span t-field="o.request_date_from" /> )<br />
+                                    </h5>
+
+                                    <center>
+                                            <span>ولكم مني جزيل الشكر؛؛؛</span>
+
+                                            <br /><br />
+                                    </center>
+
+                                    <div style="solid;text-align:left;padding:20px 0;">
+                                        <h5>مقدم الطلب : <span t-field="o.employee_id.name" /></h5><br/>
+                                        <h5>أدارة : <span t-field="o.department_id.name" /></h5><br/>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="solid;text-align:right;padding:20px 0;">
+                                        <h5>
+                                           نفيدكم علما بانه لا مانع لدينا <br />
+                                           من منح الموظف المذكور الاجازة المطلوبه<br />
+                                            <span> </span><br />
+                                           مدير ادارة الـ <span t-field="o.department_id.name" /><br />
+                                        </h5>
+                                    </div>
+
+                                    <div style="solid;text-align:left;padding:20px 0;">
+                                        <h5>
+                                           نوافق<br />
+                                            <span> </span><br />
+                                           مدير ادارة الموارد البشرية<br />
+                                        </h5>
+                                    </div>
+                                </div>
+
+
+                        </div>
+
+                     </t>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>
